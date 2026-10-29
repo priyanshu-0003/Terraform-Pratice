@@ -3,26 +3,31 @@ sudo yum update -y
 
 #---------------git install and java---------------
 
+sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
 sudo dnf update -y
-sudo dnf install -y git java-21-amazon-corretto
-java -version
-git --version
+sudo dnf install -y git java-21-amazon-corretto unzip wget
+
+# ------------------install terraform ------------------
+cd /tmp
+wget https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+unzip terraform_1.9.8_linux_amd64.zip
+sudo mv terraform /usr/local/bin/terraform
+sudo chmod 755 /usr/local/bin/terraform
 
 # Add Jenkins repo and installation
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 sudo dnf install -y jenkins
 sudo systemctl enable --now jenkins
-sudo systemctl status jenkins
 
 # ------------------checking version ---------------
+java -version
 sudo -u jenkins git --version
 sudo -u jenkins terraform -version
-
-# ------------------install terraform ------------------
-sudo dnf install -y dnf-plugins-core
-sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudo dnf install -y terraform
+sudo systemctl status jenkins
 
 #---------------------------------install tomcat------------------
 #sudo wget url https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.83/bin/apache-tomcat-9.0.83.tar.gz
